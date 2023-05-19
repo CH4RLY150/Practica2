@@ -57,9 +57,11 @@ Stop <%nombre de contenedor%> --force --> para de ejecutar todos los contenedore
 ### Pauseone
 Stop <%nombre de contenedor%> --force --> para de ejecutar un contenedor especificado en la consulta inicial
 ## COMANDOS PARA COMPROBAR EL FUNCIONAMIENTO DE LA APLICACIÓN WEB DESPLEGADA
-Curl lb
+Curl lb --> se trata de una petición al balanceador, que según el algoritmo de haproxy distribuirá dicho tráfico entre los n servidores arrancados
 
-while true; do curl 134.3.1.10; sleep 0.1; done
+while true; do curl 134.3.1.10; sleep 0.1; done --> es un bucle en el que se realizan consultas al balanceador constantemente
+
+curl -v http://134.3.1.10:8001 --> petición HTTP a una URL
 
 ## DOCKER
 Cp --> copiamos el fichero de virtualbox descargado en el centro de cálculo a una carpeta de nuestro disco físico (para no estar todo el rato accediendo al centro de cálculo cada vez que ejecutemos dicho programa).
@@ -70,4 +72,66 @@ Docker Pull Ubuntu --> importamos una imagen de Ubuntu
 
 Docker images / curl -XGET --unix-socket /run/docker.sock http://localhost/images/json --> listar imagines importadas (la última es una consulta HTTP al servidor dockerd, que es lo que hace el cliente docker cunado ejecutamos el comando docker images)
 
-Docker ps / curl -XGET --unix-socket /run/docker.sock http://localhost/containers/json --> listar contenedores docker corriendo o 
+Docker ps / curl -XGET --unix-socket /run/docker.sock http://localhost/containers/json --> listar contenedores docker corriendo 
+
+generamos en una carpeta de una de las máquinas virtuales del virtualbox un DOCKERFILE (imagen de un contenedor Docker con cada una de las acciones que debe realizar el dockerdemon al geenerar un contenedor docker), y donde en nuestro caso debe estar descargado el código fuente de la aplicación a desplegar...
+
+	FROM openjdk:8 --> indica la imagen de la que partimos para generar el contenedor docker
+	
+	RUN mkdir -p /root/ARSO-lab72/es/upm/dit/arso/lab2 --> especificamos (si no existe se crea) la carpeta en la que se va a desplegar nuestra aplicación
+	
+	COPY Application.java /root/ARSO-lab72/es/upm/dit/arso/lab2/Application.java --> copiamos el código fuente de nuestra aplicación
+	
+	EXPOSE 8000 --> asignamos el puerto 8000 a nuestra aplicación web para estar esuchando las posibles peticiones que le lleguen 
+	
+	5 WORKDIR /root/ARSO-lab72 --> fijamos una carpeta de trabajo 
+	
+	RUN javac es/upm/dit/arso/lab2/Application.java --> compilamos el código de la aplicación 
+	
+	ENTRYPOINT java es.upm.dit.arso.lab2.Application --> cuando se cree el contenedor de docker se debe ejecutar por defecto el código de la aplicación
+
+docker build -t imagenarso . --> Desde la misma carpeta donde hemos guardado todo (DockerFile y Application.java) creamos la imagen 
+
+docker swarm init --> inicializamos la distribución de carga entre las replicas del stack que vamos a generar
+
+docker stack deploy -c docker-compose.yml apparso --> desplegamos el stack (conjunto de replicas de una imagen, que está especificada en el documento docker-compose.yml), que nos permite atender a todas las consultas posibles distribuyendo dicho tráfico entre 5 replicas (viene determinada en el código del docker-compose.yml)
+
+código de configuración del stack en el fichero docker.compose.yml:
+	version: "3"
+	
+	services:
+	
+		servicioarso1:
+		
+			image: imagenarso:latest
+			
+			deploy:
+			
+				replicas: 5
+				
+				resources:
+				
+					limits:
+					
+						cpus: "0.1"
+						
+						memory: 50M
+						
+				restart_policy:
+				
+					condition: on-failure
+					
+			ports:
+			
+				- "8000:8000" --> creamos y arrancamos un contenedor Dockerdemon (estamos especificando que el puerto 8000 del contenedor se asocie/resuelva al puerto 8000 de la máquina física)
+				
+			networks:
+			
+				- webnet
+				
+	networks:
+	
+	webnet:
+	
+Esto que hay especificado en el documento docker.compose.yml es lo mismo qe hacer 5 veces seguidas --> docker run -it --rm -p 8000:8000 imagenarso
+
