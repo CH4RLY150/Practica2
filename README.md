@@ -15,6 +15,16 @@ Set eth0 --> asignamos a la(s) tarjeta(s) de conexión de red de cada contenedor
 Db --> ejecutamos el “-apt update” para actualizar __?__ y luego descargamos el código de mongodb para poder almacenar datos en con un tipo de base de datos no relacional
 Servidores --> pasamos el fichero install.sh al contenedor + Chmod +x --> cambia los permisos de acceso a un fichero (en este caso añade un permiso de fichero ejecutable) + ejecutamos su código, donde tenemos un update y una descarga de los ficheros en la carpeta app que también hemos transferido al contenedor (con un push). Ahí están todos los documentos necesarios para el correcto funcionamiento de la aplicación, además de hacer un dump de todos los pacientes semilla a la base de datos ya configurada.
 Balanceador (lb) --> ejecutamos el “-apt update” para actualizar __?__ y luego descargamos el código de la aplicación haproxy que se encargará de redirigir todo el tráfico de peticiones HTTP a los servidores. Al modificar el documento de haproxy.cfg estamos especificando que en el puerto 8001 están conectados los puertos 8000 de cada servidor, diferenciables por su dirección IP. 
+### Configure Remoto 
+configuración de acceso remoto a servicios desplegados mediante lxd, 
+    #db$ ip addr show
+		#db$ lxc config set core.https_address IP-B:8443
+		#db$ lxc config set core.trust_password mypass
+Ordenador_Principal$ lxc config set core.https address IP-A:8443 --> configura la dirección y puerto de acceso remoto al servidor LXD
+Ordenador_Principal$ lxc config set core.trust password mypass --> define contraseña de acceso
+Ordenador_Principal$ lxc remote add remotodb IP-B:8443 --password mypass --accept-certificate --> Acreditarse en el sistema remoto que ejecuta el servicio LXD del equipo lB
+Ordenador_Principal$ lxc network set remoto:lxdbr0 ipv4.address 134.3.0.1/24
+Ordenador_Principal$ lxc network set remoto:lxdbr0 ipv4.nat true --> Configurar un bridge remoto
 ### Start
 Start --> arranca un contenedor linux
 Forever --> ejecuta de manera indefinida el código del documento rest_server.js que le hace estar escuchando constantemente a posibles solicitudes remotas.
