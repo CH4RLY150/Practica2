@@ -9,7 +9,7 @@ Lxd init –auto
 
 Cat pfinal2.py 
 ## EXPLICACIÓN DEL DOCUMENTO PFINAL2.PY
-Logging.error  es un módulo que funciona como un print, solo que nos permite filtrar según los niveles de interés del mensaje (debug, info, warning, error and critical). Este nos permite mantenernos constantemente informados sobre los procesos que se están ejecutando en nuestro programa junto a los posibles fallos que pueda llegar a tener. 
+Logging.error --> es un módulo que funciona como un print, solo que nos permite filtrar según los niveles de interés del mensaje (debug, info, warning, error and critical). A partir de los logs estamos constantemente informados sobre los procesos que se están ejecutando en nuestro programa junto a los posibles fallos que pueda llegar a tener. 
 ### Create
 Init --> crea la instancia de un contenedor Linux
 
@@ -53,9 +53,9 @@ Delete --> elimina las instancias de contenedores Linux (una vez parados)
 ### List
 List --> listea los contenedores mostrados 
 ### Pause
-Stop <%> --force --> para de ejecutar un contenedor
+Stop <nombre de contenedor> --force --> para de ejecutar todos los contenedores creados
 ### Pauseone
-
+Stop <nombre de contenedor> --force --> para de ejecutar un contenedor especificado en la consulta inicial
 ## COMANDOS PARA COMPROBAR EL FUNCIONAMIENTO DE LA APLICACIÓN WEB DESPLEGADA
 Curl lb
 
