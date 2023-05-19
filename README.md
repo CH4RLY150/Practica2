@@ -53,9 +53,9 @@ Delete --> elimina las instancias de contenedores Linux (una vez parados)
 ### List
 List --> listea los contenedores mostrados 
 ### Pause
-Stop <nombre de contenedor> --force --> para de ejecutar todos los contenedores creados
+Stop <%nombre de contenedor%> --force --> para de ejecutar todos los contenedores creados
 ### Pauseone
-Stop <nombre de contenedor> --force --> para de ejecutar un contenedor especificado en la consulta inicial
+Stop <%nombre de contenedor%> --force --> para de ejecutar un contenedor especificado en la consulta inicial
 ## COMANDOS PARA COMPROBAR EL FUNCIONAMIENTO DE LA APLICACIÓN WEB DESPLEGADA
 Curl lb
 
