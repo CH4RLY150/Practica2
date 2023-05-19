@@ -15,6 +15,8 @@ Init --> crea la instancia de un contenedor Linux
 
 Network --> configuramos para cada bridge la dirección ip de cada subred en el protocolo de red IPv4
 
+The bridge network type allows to create a virtual L2 Ethernet switch that connects the instances that use it together into a single network L2 segment. Bridges created by LXD are managed, which means that in addition to creating the bridge interface itself, LXD also sets up a local dnsmasq process to provide DHCP, IPv6 route announcements and DNS services to the network.
+
 Set eth0 --> asignamos a la(s) tarjeta(s) de conexión de red de cada contenedor un bridge con una dirección ip 
 ### Configure
 Db --> ejecutamos el “-apt update” para actualizar __?__ y luego descargamos el código de mongodb para poder almacenar datos en con un tipo de base de datos no relacional
