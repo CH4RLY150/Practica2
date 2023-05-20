@@ -19,10 +19,10 @@ The bridge network type allows to create a virtual L2 Ethernet switch that conne
 
 Set eth0 --> asignamos a la(s) tarjeta(s) de conexión de red de cada contenedor un bridge con una dirección ip 
 ### Configure
-Db --> ejecutamos el “-apt update” para actualizar __?__ y luego descargamos el código de mongodb para poder almacenar datos en con un tipo de base de datos no relacional
+Db --> ejecutamos el “-apt update” que busca actualizaciones del SO y luego descargamos el código de mongodb para poder almacenar datos en con un tipo de base de datos no relacional
 Servidores --> pasamos el fichero install.sh al contenedor + Chmod +x --> cambia los permisos de acceso a un fichero (en este caso añade un permiso de fichero ejecutable) + ejecutamos su código, donde tenemos un update y una descarga de los ficheros en la carpeta app que también hemos transferido al contenedor (con un push). Ahí están todos los documentos necesarios para el correcto funcionamiento de la aplicación, además de hacer un dump de todos los pacientes semilla a la base de datos ya configurada.
 
-Balanceador (lb) --> ejecutamos el “-apt update” para actualizar __?__ y luego descargamos el código de la aplicación haproxy que se encargará de redirigir todo el tráfico de peticiones HTTP a los servidores. Al modificar el documento de haproxy.cfg estamos especificando que en el puerto 8001 están conectados los puertos 8000 de cada servidor, diferenciables por su dirección IP. 
+Balanceador (lb) --> ejecutamos el “-apt update” que busca actualizaciones del SO y luego descargamos el código de la aplicación haproxy que se encargará de redirigir todo el tráfico de peticiones HTTP a los servidores. Al modificar el documento de haproxy.cfg estamos especificando que en el puerto 8001 están conectados los puertos 8000 de cada servidor, diferenciables por su dirección IP. 
 ### Configure Remoto 
 configuración de acceso remoto a servicios desplegados mediante lxd en un ordenador ajeno.
 
