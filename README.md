@@ -57,7 +57,7 @@ Stop <%nombre de contenedor%> --force --> para de ejecutar todos los contenedore
 ### Pauseone
 Stop <%nombre de contenedor%> --force --> para de ejecutar un contenedor especificado en la consulta inicial
 ## COMANDOS PARA COMPROBAR EL FUNCIONAMIENTO DE LA APLICACIÓN WEB DESPLEGADA
-Curl lb --> se trata de una petición al balanceador, que según el algoritmo de haproxy distribuirá dicho tráfico entre los n servidores arrancados
+Curl lb --> se trata de un interprete de comandos que soporta diferentes protocolos, simulando las acciones de un usuario en un navegador web (en este caso es una petición al balanceador)
 
 while true; do curl 134.3.1.10; sleep 0.1; done --> es un bucle en el que se realizan consultas al balanceador constantemente
 
