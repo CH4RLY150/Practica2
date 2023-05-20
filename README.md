@@ -70,7 +70,7 @@ Virtualbox --> importamos la imagen de una máquina virtual que alojaremos en un
 
 Docker Pull Ubuntu --> importamos una imagen de Ubuntu 
 
-Docker images / curl -XGET --unix-socket /run/docker.sock http://localhost/images/json --> listar imagines importadas (la última es una consulta HTTP al servidor dockerd, que es lo que hace el cliente docker cunado ejecutamos el comando docker images)
+Docker images / curl -XGET --unix-socket /run/docker.sock http://localhost/images/json --> listar imagines importadas (la última es una consulta HTTP al servidor dockerd con interfaz API-REST, que es lo que hace el cliente docker cuando ejecutamos el comando docker images, solo que este hace una representación más "limpia" del json que recibe)
 
 Docker ps / curl -XGET --unix-socket /run/docker.sock http://localhost/containers/json --> listar contenedores docker corriendo 
 
