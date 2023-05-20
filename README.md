@@ -68,8 +68,6 @@ Cp --> copiamos el fichero de virtualbox descargado en el centro de cálculo a u
 
 Virtualbox --> importamos la imagen de una máquina virtual que alojaremos en una carpeta del disco (físico). Ejecutamos la máquina virtual Ubuntu, dentro del terminal podemos ejecutar comandos docker
 
-Docker Pull Ubuntu --> importamos una imagen de Ubuntu 
-
 Docker images / curl -XGET --unix-socket /run/docker.sock http://localhost/images/json --> listar imagines importadas (la última es una consulta HTTP al servidor dockerd con interfaz API-REST, que es lo que hace el cliente docker cuando ejecutamos el comando docker images, solo que este hace una representación más "limpia" del json que recibe)
 
 Docker ps / curl -XGET --unix-socket /run/docker.sock http://localhost/containers/json --> listar contenedores docker corriendo 
@@ -94,7 +92,7 @@ docker build -t imagenarso . --> Desde la misma carpeta donde hemos guardado tod
 
 docker swarm init --> inicializamos la distribución de carga entre las replicas del stack que vamos a generar
 
-docker stack deploy -c docker-compose.yml apparso --> desplegamos el stack (conjunto de replicas de una imagen, que está especificada en el documento docker-compose.yml), que nos permite atender a todas las consultas posibles distribuyendo dicho tráfico entre 5 replicas (viene determinada en el código del docker-compose.yml)
+docker stack deploy -c docker-compose.yml apparso --> desplegamos el stack (conjunto de replicas de una imagen, que está especificada en el documento docker-compose.yml), que nos permite atender a todas las consultas posibles distribuyendo dicho tráfico entre 5 replicas (viene determinada en el código del docker-compose.yml). Al final le asignamos un nombre al stack = "apparso"
 
 código de configuración del stack en el fichero docker.compose.yml:
 	version: "3"
@@ -135,3 +133,6 @@ código de configuración del stack en el fichero docker.compose.yml:
 	
 Esto que hay especificado en el documento docker.compose.yml es lo mismo qe hacer 5 veces seguidas --> docker run -it --rm -p 8000:8000 imagenarso
 
+Para cerrarlo todo tendríamos que: "$docker stack rm apparso" y "docker swarm leave --force"
+
+En vez de hacerlo por medio de un SWARM y un STACK, podríamos haber ejecutado en la misma carpeta que el docker.compose.yml al comando de "$docker-compose up", que en base al fichero mencionado antes despliega una apliación con varios servicios relacionados sobre un sistema de servidores docker. Luego para cerrarlo tendríamos que hacer: "$docker-compose down"
