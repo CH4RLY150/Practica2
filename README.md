@@ -76,23 +76,23 @@ generamos en una carpeta de una de las máquinas virtuales del virtualbox un DOC
 
 	FROM openjdk:8 --> indica la imagen de la que partimos para generar el contenedor docker
 	
-	RUN mkdir -p /root/ARSO-lab72/es/upm/dit/arso/lab2 --> especificamos (si no existe se crea) la carpeta en la que se va a desplegar nuestra aplicación
+	RUN mkdir -p /root/ARSO-lab72/es/upm/dit/arso/lab2 --> especificamos la carpeta en la que se va a desplegar nuestra aplicación (si no existe se crea)
 	
-	COPY Application.java /root/ARSO-lab72/es/upm/dit/arso/lab2/Application.java --> copiamos el código fuente de nuestra aplicación
+	COPY Application.java /root/ARSO-lab72/es/upm/dit/arso/lab2/Application.java --> copiamos el código fuente de nuestra aplicación en la dirección de destino especificada
 	
-	EXPOSE 8000 --> asignamos el puerto 8000 a nuestra aplicación web para estar esuchando las posibles peticiones que le lleguen 
+	EXPOSE 8000 --> asignamos el puerto 8000 de nuestra máquina a nuestro contenedor para estar esuchando las posibles peticiones que le lleguen a la aplicacion web
 	
-	5 WORKDIR /root/ARSO-lab72 --> fijamos una carpeta de trabajo 
+	5 WORKDIR /root/ARSO-lab72 --> fijamos una carpeta de trabajo (carpeta donde se despliega toda la aplicación)
 	
-	RUN javac es/upm/dit/arso/lab2/Application.java --> compilamos el código de la aplicación 
+	RUN javac es/upm/dit/arso/lab2/Application.java --> compilamos el código del documento de nuestra aplicación 
 	
 	ENTRYPOINT java es.upm.dit.arso.lab2.Application --> cuando se cree el contenedor de docker se debe ejecutar por defecto el código de la aplicación
 
 docker build -t imagenarso . --> Desde la misma carpeta donde hemos guardado todo (DockerFile y Application.java) creamos la imagen 
 
-docker swarm init --> inicializamos la distribución de carga entre las replicas del stack que vamos a generar
+docker swarm init --> inicializamos el cluster encargado de la distribución de carga entre las replicas del stack que vamos a generar
 
-docker stack deploy -c docker-compose.yml apparso --> desplegamos el stack (conjunto de replicas de una imagen, que está especificada en el documento docker-compose.yml), que nos permite atender a todas las consultas posibles distribuyendo dicho tráfico entre 5 replicas (viene determinada en el código del docker-compose.yml). Al final le asignamos un nombre al stack = "apparso"
+docker stack deploy -c docker-compose.yml apparso --> desplegamos el stack (conjunto de replicas de una imagen, que está especificada en el documento docker-compose.yml), que nos permite atender a todas las consultas posibles distribuyendo dicho tráfico entre un número de replicas (viene determinada en el código del docker-compose.yml). Al final le asignamos un nombre al stack = "apparso".
 
 código de configuración del stack en el fichero docker.compose.yml:
 	version: "3"
@@ -135,4 +135,4 @@ Esto que hay especificado en el documento docker.compose.yml es lo mismo qe hace
 
 Para cerrarlo todo tendríamos que: "$docker stack rm apparso" y "docker swarm leave --force"
 
-En vez de hacerlo por medio de un SWARM y un STACK, podríamos haber ejecutado en la misma carpeta que el docker.compose.yml al comando de "$docker-compose up", que en base al fichero mencionado antes despliega una apliación con varios servicios relacionados sobre un sistema de servidores docker. Luego para cerrarlo tendríamos que hacer: "$docker-compose down"
+Aunque, en vez de haberlo hecho por medio de un SWARM y un STACK, podríamos haber ejecutado en la misma carpeta que el docker.compose.yml el comando de "$docker-compose up", que en base al fichero mencionado antes despliega una apliación con varios servicios relacionados sobre un sistema de servidores docker. Luego para cerrarlo tendríamos que hacer: "$docker-compose down"
