@@ -11,17 +11,16 @@ try:
 			#db$ ip addr show
 			#db$ lxc config set core.https_address IP-B:8443
 			#db$ lxc config set core.trust_password mypass
-			#db$ lxc config device add db miproxy proxy listen=tcp:AAA.AAA.AAA.AAA:27017 connect=tcp:134.3.0.20:27017
 	db = sys.argv[1]
 	parametros = sys.argv[2]
 	ip_addr = sys.argv[3]
 	port = sys.argv[4]
 	ip_ = sys.argv[5]
-	IP-A = sys.argv[6]
+	IP_A = sys.argv[6]
 	lxdbr = sys.arv[7]
 	sentencia = ip_addr + ":" + port
 	#configuración del remoto
-	subprocess.run(["lxc", "config", "set", "core.https_address", IP-A+":"+port])
+	subprocess.run(["lxc", "config", "set", "core.https_address", IP_A+":"+port])
 	subprocess.run(["lxc", "remote", "add", "remoto"+db, ip_addr+":"+port, "--password", "mypass", "--accept-certificate"])
 	#configuración de red y bridges
 	subprocess.run(["lxc", "network", "set", "remoto"+db+":"+lxdbr, "ipv4.addres", ip_])

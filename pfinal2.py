@@ -15,6 +15,7 @@ ip0 = "134.3.0.1"
 ip_inc = "134.3."
 ip_end = ".1/24"
 port = "8433"
+port_serv = "8001"
 lxdbr_remoto = "lxdbr0"
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
@@ -60,7 +61,7 @@ try:
 	elif orden == "start":
 		subprocess.run(["sudo", "apt", "install", "xterm"])
 		# iniciamos cada una de las máquinas virtuales ya creadas con el create
-		with open("orden.txt", "rb") as fich:
+		with open("numero.txt", "rb") as fich:
 			numero = pickle.load(fich)
 		subprocess.run(["python3", orden+".py", s, numero])
 		subprocess.run(["python3", orden+".py", lb, n_lb])		
@@ -68,7 +69,7 @@ try:
 
 	elif orden == "list":
 		# listado de las máquinas virtuales
-		with open("orden.txt", "rb") as fich:
+		with open("numero.txt", "rb") as fich:
 			numero = pickle.load(fich)
 		subprocess.run(["python3", orden+".py", s, numero])
 		subprocess.run(["python3", orden+".py", lb, n_lb])
@@ -78,7 +79,7 @@ try:
 	elif orden == "delete":
 		subprocess.run(["python3", "pfinal2.py", "pause"])
 		# delete de cada uno de las máquinas virtuales ya creadas con el create
-		with open("orden.txt", "rb") as fich:
+		with open("numero.txt", "rb") as fich:
 			numero = pickle.load(fich)
 		subprocess.run(["python3", orden+".py", s, numero])
 		subprocess.run(["python3", orden+".py", lb, n_lb])
@@ -94,7 +95,7 @@ try:
 		print("deleted!")
 		
 	elif orden == "pause": # esta función pausa todos los contenedores creados al llamarla
-		with open("orden.txt", "rb") as fich:
+		with open("numero.txt", "rb") as fich:
 			numero = pickle.load(fich)
 		subprocess.run(["python3", orden+".py", s, numero])
 		subprocess.run(["python3", orden+".py", lb, n_lb])
@@ -115,20 +116,23 @@ try:
 
 	elif orden == "configure": # configura el servicio web (app en servidores y base de datos en db) + el balanceador
 		try:
-			ip-B = sys.argv[2]
-			IP-A = sys.argv[3]
+			IP_B = sys.argv[2]
+			subprocess.run(["python3", "ipremoto.py"])
+			with open("ip_remoto.txt", "rb") as fich:
+				IP_A = picle.load(fich)
+			fich.close()
 			with open("remoto.txt", "wb") as fich:
 				pickle.dump(True, fich)
 			with open("ipdb.txt", "wb") as ipdb:
 				pickle.dump(ip-B, ipdb)
-			subprocess.run(["python3", "configureremoto.py", db, n_db, ip-B, port, ip_inc+"0"+ip_end, IP-A, lxdbr_remoto])
+			subprocess.run(["python3", "configureremoto.py", db, n_db, ip_B, port, ip_inc+"0"+ip_end, IP_A, lxdbr_remoto])
 		except IndexError:
 			with open("remoto.txt", "wb") as fich:
 				pickle.dump(False, fich)
 			subprocess.run(["python3", "configure.py", db, n_db])
 
 		subprocess.run(["python3", "configure_servidores.py", s, ip0])
-		subprocess.run(["python3", "configure_lb.py", lb, n_lb])
+		subprocess.run(["python3", "configure_lb.py", lb, n_lb, s, port_serv])
 		print("configured!")
 	else:
 		# error del parámetro orden
