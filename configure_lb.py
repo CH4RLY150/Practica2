@@ -2,6 +2,7 @@ import sys
 import subprocess
 import logging
 import pickle
+import time
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
@@ -15,6 +16,7 @@ try:
 	for i in range(int(parametros)):
 		nombre = orden + str(i)
 		subprocess.run(["lxc", "start", nombre])
+		time.sleep(5)
 		subprocess.run(["lxc", "exec", nombre, "--", "apt", "update"])
 		subprocess.run(["lxc", "exec", nombre, "--", "apt","install", "haproxy"])
 		with open("numero.txt", "rb") as nvm:
