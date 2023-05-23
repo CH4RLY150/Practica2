@@ -10,33 +10,36 @@ lxdbr = "lxdbr"
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
-try:
-	orden = sys.argv[1] 
-	parametros = sys.argv[2]
-	ip1 = sys.argv[3]
+def networkconfig(orden, parametros, ip1, n_lb):
+	try:
 		# Asignamos cada servidor al bridge lxdbr0 y asignamos su dirección IPv4:
-	if orden == "lb":
-		n_lb = sys.argv[4]
-		for j in range(int(n_lb)):
-			nombre = orden + str(j)
+		if orden == "lb":
+			for j in range(int(n_lb)):
+				if n_lb == "1":
+					nombre = orden
+				else:
+					nombre = orden + str(j)
+				for i in range(int(parametros)):
+					subprocess.run(["lxc", "network", "attach", lxdbr+str(i), nombre, "eth"+str(i)])
+					subprocess.run(["lxc", "config", "device", "set", nombre, "eth"+str(i), "ipv4.address", ip1 + str(i) + IP_lb])
+		elif orden == "s":
 			for i in range(int(parametros)):
-				subprocess.run(["lxc", "network", "attach", lxdbr+str(i), nombre, "eth"+str(i)])
-				subprocess.run(["lxc", "config", "device", "set", nombre, "eth"+str(i), "ipv4.address", ip1 + str(i) + IP_lb])
-	elif orden == "vm":
-		for i in range(int(parametros)):
-			nombre = orden + str(i)
-			m = i+1
-			subprocess.run(["lxc", "network", "attach", lxdbr0, nombre, "eth0"])
-			subprocess.run(["lxc", "config", "device", "set", nombre, "eth0", "ipv4.address", ip1 + str(m)])
-	elif orden == "db":
-		for i in range(int(parametros)):
-			nombre = orden + str(i) 
-			subprocess.run(["lxc", "network", "attach", lxdbr0, nombre, "eth0"])
-			subprocess.run(["lxc", "config", "device", "set", nombre, "eth0", "ipv4.address", ip1 + str(i)])
-			with open("ip_db.txt", "wb") as fich:
-				pickle.dump(ip1 + str(i), fich)
-except IndexError:
-	logger.error("IndexError, no se ha introducido ninguna orden")
-	#raise
-except KeyboardInterrupt:
-	logger.error("Terminado")
+				nombre = orden + str(i)
+				m = i+1
+				subprocess.run(["lxc", "network", "attach", lxdbr0, nombre, "eth0"])
+				subprocess.run(["lxc", "config", "device", "set", nombre, "eth0", "ipv4.address", ip1 + str(m)])
+		elif orden == "db":
+			for i in range(int(parametros)):
+				if parametros == "1":
+					nombre = orden
+				else:
+					nombre = orden + str(j)
+				subprocess.run(["lxc", "network", "attach", lxdbr0, nombre, "eth0"])
+				subprocess.run(["lxc", "config", "device", "set", nombre, "eth0", "ipv4.address", ip1 + str(i)])
+				with open("ip_db.txt", "wb") as fich:
+					pickle.dump(ip1 + str(i), fich)
+	except IndexError:
+		logger.error("IndexError, no se ha introducido ninguna orden")
+		#raise
+	except KeyboardInterrupt:
+		logger.error("Terminado")

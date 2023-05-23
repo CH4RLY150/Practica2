@@ -2,8 +2,21 @@ import sys
 import subprocess
 import logging
 import pickle
+import time
+import start
+import red
+import crear
+import networkconfig
+import eth
+import lista
+import delete
+import pause
+import configure
+import configureremoto
+import configure_servidores
+import configure_lb
 
-s = "vm"
+s = "s"
 lb = "lb"
 n_lb = "1"
 db = "db"
@@ -14,8 +27,10 @@ ip__db = "134.3.0.2"
 ip0 = "134.3.0.1"
 ip_inc = "134.3."
 ip_end = ".1/24"
-port = "8433"
-port_serv = "8001"
+port = "8433"  #puerto en el que escucha lxd
+port_serv = "8001"   # especificado por el código en app
+lxdbr_ = "lxdbr"
+lxdbr0 = "lxdbr0"
 lxdbr_remoto = "lxdbr0"
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
@@ -43,19 +58,21 @@ try:
 		with open("numero.txt", "wb") as fich:
 			pickle.dump(parametros, fich)
 		# creación de los bridges virtuales y asignación de IP (subred)
-		subprocess.run(["python3", "network.py", n_bridges, ip_inc, ip_end])
+		red.red(n_bridges, ip_inc, ip_end, lxdbr_)
 		# creación de la base de datos db y le asignamos su tarjeta a un bridge
-		subprocess.run(["python3", "crear.py", db, imagen, n_db])
-		subprocess.run(["python3", "networkconfig.py", db, n_db, ip__db])
-		subprocess.run(["python3", "start.py", db, n_db])
+		crear.crear(db, imagen, n_db)
+		networkconfig.networkconfig(db, n_db, ip__db, n_lb)
+		start.start(db, n_db)
+		time.sleep(5)
+		configure.configure(db, n_db)
 		# creación de las máquinas virtuales y asignación de su tarjeta al bridge lxdbr0
-		subprocess.run(["python3", "crear.py", s, imagen, parametros])
-		subprocess.run(["python3", "networkconfig.py", s, parametros, ip0])
+		crear.crear(s, imagen, parametros)
+		networkconfig.networkconfig(s, "1", ip0, n_lb)
 		# creación del balanceador de carga para redireccionar las peticiones de los clientes a los servidores para equilibrar la carga y ocultar al cliente la plataforma existentes de los servidores
-		subprocess.run(["python3", "crear.py", lb, imagen, n_lb])
-		subprocess.run(["python3", "eth.py", lb, n_lb])
+		crear.crear(lb, imagen, n_lb)
+		eth.eth(lb, n_lb)
 		# Asignamos las tarjetas del contenedor lb a los bridges lxdbr1 & lxdbr0 y Asignamos sus direcciones IPv4:
-		subprocess.run(["python3", "networkconfig.py", lb, n_bridges, ip_inc, n_lb])
+		networkconfig.networkconfig(lb, n_bridges, ip_inc, n_lb)
 		print("created!")
 	
 	elif orden == "start":
@@ -63,17 +80,17 @@ try:
 		# iniciamos cada una de las máquinas virtuales ya creadas con el create
 		with open("numero.txt", "rb") as fich:
 			numero = pickle.load(fich)
-		subprocess.run(["python3", orden+".py", s, numero])
-		subprocess.run(["python3", orden+".py", lb, n_lb])		
+		start.start(s, numero)
+		start.start(lb, n_lb)		
 		print("started!")
 
 	elif orden == "list":
 		# listado de las máquinas virtuales
 		with open("numero.txt", "rb") as fich:
 			numero = pickle.load(fich)
-		subprocess.run(["python3", orden+".py", s, numero])
-		subprocess.run(["python3", orden+".py", lb, n_lb])
-		subprocess.run(["python3", orden+".py", db, n_db])
+		lista.lista(s, numero)
+		lista.lista(lb, n_lb)
+		lista.lista(db, n_db)
 		subprocess.run(["lxc", orden])
 
 	elif orden == "delete":
@@ -81,58 +98,60 @@ try:
 		# delete de cada uno de las máquinas virtuales ya creadas con el create
 		with open("numero.txt", "rb") as fich:
 			numero = pickle.load(fich)
-		subprocess.run(["python3", orden+".py", s, numero])
-		subprocess.run(["python3", orden+".py", lb, n_lb])
+		delete.delete(s, numero)
+		delete.delete(lb, n_lb)
 		with open("remoto.txt", "rb") as fich:
 			valor = pickle.load(fich)
 		if valor == False:
-			subprocess.run(["python3", orden+".py", db, n_db])
+			delete.delete(db, n_db)
 		else:
-			subprocess.run(["python3", orden+".py", db, n_db])
+			print("remoto")#delete remoto
+			#//////////////////////////////////////////////////
 		for i in range(int(n_bridges)-1):
 			n = i + 1 
-			subprocess.run(["lxc", "network", "delete", "lxdbr"+str(n)])
+			subprocess.run(["lxc", "network", "delete", lxdbr_+str(n)])
 		print("deleted!")
 		
 	elif orden == "pause": # esta función pausa todos los contenedores creados al llamarla
 		with open("numero.txt", "rb") as fich:
 			numero = pickle.load(fich)
-		subprocess.run(["python3", orden+".py", s, numero])
-		subprocess.run(["python3", orden+".py", lb, n_lb])
+		pause.pause(s, numero)
+		pause.pause(lb, n_lb)
 		with open("remoto.txt", "rb") as fich:
 			valor = pickle.load(fich)
 		if valor == False:
-			subprocess.run(["python3", orden+".py", db, n_db])
+			pause.pause(db, n_db)
 		else:
-			subprocess.run(["remoto"])
+			print("remoto")# pause remoto
+			#//////////////////////////////////////////////////
 		print("paused!")
 
 	elif orden == "pauseone": # pausa la mv de valor parametros-1
-		vm = sys.argv[2]
+		var = sys.argv[2]
 		parametros = sys.argv[3]
-		nombre = vm + str(int(parametros)-1)
+		if orden == s:
+			nombre = vm + str(int(parametros)-1)
+		elif parametros == "1":
+			nombre = var
+		else:
+			nombre = var + str(int(parametros)-1)
 		subprocess.run(["lxc", "stop", nombre, "--force"])
 		print("paused "+nombre+"!")
 
 	elif orden == "configure": # configura el servicio web (app en servidores y base de datos en db) + el balanceador
 		try:
 			IP_B = sys.argv[2]
-			subprocess.run(["python3", "ipremoto.py"])
-			with open("ip_remoto.txt", "rb") as fich:
-				IP_A = picle.load(fich)
-			fich.close()
 			with open("remoto.txt", "wb") as fich:
 				pickle.dump(True, fich)
 			with open("ipdb.txt", "wb") as ipdb:
 				pickle.dump(ip-B, ipdb)
-			subprocess.run(["python3", "configureremoto.py", db, n_db, ip_B, port, ip_inc+"0"+ip_end, IP_A, lxdbr_remoto])
+			configureremoto.configureremoto(db, n_db, ip_B, port, ip_inc+"0"+ip_end, lxdbr_remoto)
 		except IndexError:
 			with open("remoto.txt", "wb") as fich:
 				pickle.dump(False, fich)
-			subprocess.run(["python3", "configure.py", db, n_db])
 
-		subprocess.run(["python3", "configure_servidores.py", s, ip0])
-		subprocess.run(["python3", "configure_lb.py", lb, n_lb, s, port_serv])
+		configure_servidores.configure_servidores(s, ip0, lxdbr0)
+		configure_lb.configure_lb(lb, n_lb, s, port_serv)
 		print("configured!")
 	else:
 		# error del parámetro orden
