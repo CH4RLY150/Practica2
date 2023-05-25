@@ -1,5 +1,7 @@
 # Practica2
 práctica 2 de ARSO
+
+CUIDADO CUANDO OS DESCARGUEIS EL CÓDIGO, MIRAR SI EN EL CÓDIGO ALGUNA LÍNEA EN LA QUE PONGA ALGO COMO "home/c.mbarros/Práctica2/", CAMBIARLO POR EL PATH DE VUESTRA CARPETA DONDE TEGAIS EL CÓDIGO LA PRÁCTICA 2  
 ## COMANDOS AL INICIO DE LA PRÁCTICA
 Sudo usermod –a –G lxd $USER
 
@@ -24,6 +26,8 @@ Servidores --> pasamos el fichero install.sh al contenedor + Chmod +x --> cambia
 
 Balanceador (lb) --> ejecutamos el “-apt update” que busca actualizaciones del SO y luego descargamos el código de la aplicación haproxy que se encargará de proporcionarnos un punto único de entrada de peticiones a la aplicación, además de redirigir todo el tráfico de peticiones HTTP de manera efectiva entre los servidores. Al modificar el documento de haproxy.cfg estamos especificando que en el puerto 8001 (preestablecido por el código de la "app") están conectados los puertos 8000 de cada servidor, diferenciables por su dirección IP. 
 ### Configure Remoto 
+Hay una función definida en un fichero "ipremoto.py", que nos dice cúal es la IP de un ordenador del laboratorio a partor de su número (por ejemplo "ipremoto.guess_ip("l212")")
+
 configuración de acceso remoto a servicios desplegados mediante lxd en un ordenador ajeno.
 
    	#db$ ip addr show
