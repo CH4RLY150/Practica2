@@ -13,27 +13,11 @@ def configure_servidores(vm, ip0, lxdbr0):
 	try:
 		with open("numero.txt", "rb") as fich:
 			numero = pickle.load(fich)
-		with open("ip_db.txt", "rb") as ipdb:
-			ip = pickle.load(ipdb)
-		
-		#determinar el ip de la DB en app
-		lines = list()
-		with open("/home/c.mbarros/Práctica_2/app/md-seed-config.js", "r+") as fichero:
-			lines = fichero.readlines()
-			lines[3-1]="const mongoURL = process.env.MONGO_URL || 'mongodb://"+ip+":27017/bio_bbdd';\n"
-		fichero.close()
-		with open("/home/c.mbarros/Práctica_2/app/md-seed-config.js", "w") as files:
-			files.writelines(lines)
-		files.close()
-		with open("/home/c.mbarros/Práctica_2/app/rest_server.js", "r+") as fichero:
-			lines = fichero.readlines()
-			lines[12-1]="    await mongoose.connect('mongodb://"+ip+"/bio_bbdd',{ useNewUrlParser: true, useUnifiedTopology: true })\n"
-		with open("/home/c.mbarros/Práctica_2/app/rest_server.js", "w") as files:
-			files.writelines(lines)
 
 		#configuración de servidores
 		with open("nom_imagen.txt", "rb") as fich:
 			imagen_s = pickle.load(fich)
+
 		for i in range(int(numero)-1):
 			nombre = vm + str(i+1)
 			subprocess.run(["lxc", "init", imagen_s, nombre])

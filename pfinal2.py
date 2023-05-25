@@ -15,6 +15,9 @@ import configure
 import configureremoto
 import configure_servidores
 import configure_lb
+import delete_remoto
+import pause_remoto
+import ipremoto
 
 s = "s"
 lb = "lb"
@@ -105,8 +108,7 @@ try:
 		if valor == False:
 			delete.delete(db, n_db)
 		else:
-			print("remoto")#delete remoto
-			#//////////////////////////////////////////////////
+			delete_remoto.delete_remoto(db, n_db)
 		for i in range(int(n_bridges)-1):
 			n = i + 1 
 			subprocess.run(["lxc", "network", "delete", lxdbr_+str(n)])
@@ -122,8 +124,7 @@ try:
 		if valor == False:
 			pause.pause(db, n_db)
 		else:
-			print("remoto")# pause remoto
-			#//////////////////////////////////////////////////
+			pause_remoto.pause_remoto(db, n_db)
 		print("paused!")
 
 	elif orden == "pauseone": # pausa la mv de valor parametros-1
@@ -140,12 +141,15 @@ try:
 
 	elif orden == "configure": # configura el servicio web (app en servidores y base de datos en db) + el balanceador
 		try:
-			IP_B = sys.argv[2]
+			lB = sys.argv[2] # l212 por ejemplo
+			password = sys.argv[3] # contraseña del remoto en el LXC del remotodb
+			IP_B = ipremoto.guess_ip(lb)
+			IP_A = ipremoto.guess_ip("A")
 			with open("remoto.txt", "wb") as fich:
 				pickle.dump(True, fich)
 			with open("ipdb.txt", "wb") as ipdb:
 				pickle.dump(ip-B, ipdb)
-			configureremoto.configureremoto(db, n_db, ip_B, port, ip_inc+"0"+ip_end, lxdbr_remoto)
+			configureremoto.configureremoto(db, n_db, ip_B, port, ip_inc+"0"+ip_end, lxdbr_remoto, IP_A, password, s)
 		except IndexError:
 			with open("remoto.txt", "wb") as fich:
 				pickle.dump(False, fich)
