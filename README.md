@@ -35,6 +35,7 @@ configuración de acceso remoto a servicios desplegados mediante lxd en un orden
 	#db$ lxc config set core.https_address IP-B:8443
 	
 	#db$ lxc config set core.trust_password mypass
+Todo esto está resumido en un programa dentro del fichero "remoto.py", que podemos ejecutar mediante el comando "python3 remoto.py lb mypass", donde lb puede ser "l212" y mypass puede ser "contraseña", con eso ya tendríamos configurado el acceso remoto al programa LXD en el computador "lb" (NO OLVIDAR EJECUTAR LOS COMANDOS INICIALES DE USERRMOD, NEWGRP Y INIT).
 	
 
 Ordenador_Principal$ lxc config set core.https address IP-A:8443 --> configura la dirección y puerto de acceso remoto al servidor LXD
