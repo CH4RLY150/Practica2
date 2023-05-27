@@ -24,9 +24,12 @@ lb = "lb"
 n_lb = "1"
 db = "db"
 n_db = "1"
+c1 = "cl"
+n_c1 = "1"
 imagen = "ubuntu2004"
 n_bridges = "2"
 ip__db = "134.3.0.2"
+ip1 = "134.3.1.1"
 ip0 = "134.3.0.1"
 ip_inc = "134.3."
 ip_end = ".1/24"
@@ -76,6 +79,9 @@ try:
 		eth.eth(lb, n_lb)
 		# Asignamos las tarjetas del contenedor lb a los bridges lxdbr1 & lxdbr0 y Asignamos sus direcciones IPv4:
 		networkconfig.networkconfig(lb, n_bridges, ip_inc, n_lb)
+		# creación de los clientes
+		#crear.crear(c1, imagen, n_c1)
+		#networkconfig.networkconfig(c1, n_c1, ip1, n_lb)
 		print("created!")
 	
 	elif orden == "start":
@@ -84,7 +90,8 @@ try:
 		with open("numero.txt", "rb") as fich:
 			numero = pickle.load(fich)
 		start.start(s, numero)
-		start.start(lb, n_lb)		
+		start.start(lb, n_lb)	
+		#start.start(c1, n_c1)	
 		print("started!")
 
 	elif orden == "list":
@@ -94,6 +101,7 @@ try:
 		lista.lista(s, numero)
 		lista.lista(lb, n_lb)
 		lista.lista(db, n_db)
+		#lista.lista(c1, n_c1)
 		subprocess.run(["lxc", orden])
 
 	elif orden == "delete":
@@ -103,6 +111,7 @@ try:
 			numero = pickle.load(fich)
 		delete.delete(s, numero)
 		delete.delete(lb, n_lb)
+		#delete.delete(c1, n_c1)
 		with open("remoto.txt", "rb") as fich:
 			valor = pickle.load(fich)
 		if valor == False:
@@ -119,6 +128,7 @@ try:
 			numero = pickle.load(fich)
 		pause.pause(s, numero)
 		pause.pause(lb, n_lb)
+		#pause.pause(c1, n_c1)
 		with open("remoto.txt", "rb") as fich:
 			valor = pickle.load(fich)
 		if valor == False:
