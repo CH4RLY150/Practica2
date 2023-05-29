@@ -158,8 +158,8 @@ try:
 			with open("remoto.txt", "wb") as fich:
 				pickle.dump(True, fich)
 			with open("ipdb.txt", "wb") as ipdb:
-				pickle.dump(ip-B, ipdb)
-			configureremoto.configureremoto(db, n_db, ip_B, port, ip_inc+"0"+ip_end, lxdbr_remoto, IP_A, password, s)
+				pickle.dump(IP_B, ipdb)
+			configureremoto.configureremoto(db, n_db, IP_B, port, ip_inc+"0"+ip_end, lxdbr_remoto, IP_A, password, s)
 		except IndexError:
 			with open("remoto.txt", "wb") as fich:
 				pickle.dump(False, fich)

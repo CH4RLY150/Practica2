@@ -1,6 +1,7 @@
 import sys
 import subprocess
 import logging
+import time
 
 s = "s"
 lb = "lb"
@@ -16,9 +17,9 @@ def start(orden,numero):
 				nombre = orden + str(j)
 			subprocess.run(["lxc", "start", nombre])
 			if orden == s:
-				subprocess.Popen(["lxc", "exec", nombre, "--", "forever", "start", "app/rest_server.js"])
 				comando = "lxc exec " + nombre + " bash"
 				subprocess.Popen(["xterm", "-fa", "monaco", "-fs", "13", "-bg", "pink", "-fg", "black", "-e", comando])
+				subprocess.Popen(["lxc", "exec", nombre, "--", "forever", "start", "app/rest_server.js"])
 			elif orden == lb:
 				subprocess.run(["lxc", "exec", lb, "--", "start", "service", "haproxy"])
 	except IndexError:
