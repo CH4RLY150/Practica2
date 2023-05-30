@@ -9,5 +9,6 @@ def delete_remoto(db, parametros):
 		else:
 			nombre = db + str(i)
 		subprocess.run(["lxc", "delete", "remoto"+db+":"+nombre])
+	subprocess.run(["lxc", "remoto", "rm", "remoto"+db])
 
 
