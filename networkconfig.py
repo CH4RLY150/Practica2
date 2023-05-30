@@ -33,7 +33,7 @@ def networkconfig(orden, parametros, ip1, n_lb):
 				if parametros == "1":
 					nombre = orden
 				else:
-					nombre = orden + str(j)
+					nombre = orden + str(i)
 				subprocess.run(["lxc", "network", "attach", lxdbr0, nombre, "eth0"])
 				subprocess.run(["lxc", "config", "device", "set", nombre, "eth0", "ipv4.address", ip1 + str(i)])
 				with open("ip_db.txt", "wb") as fich:
@@ -43,7 +43,7 @@ def networkconfig(orden, parametros, ip1, n_lb):
 				if parametros == "1":
 					nombre = orden
 				else:
-					nombre = orden + str(j)
+					nombre = orden + str(i)
 				subprocess.run(["lxc", "network", "attach", lxdbr1, nombre, "eth0"])
 				subprocess.run(["lxc", "config", "device", "set", nombre, "eth0", "ipv4.address", ip1 + str(i+1)])
 	except IndexError:

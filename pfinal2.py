@@ -80,8 +80,8 @@ try:
 		# Asignamos las tarjetas del contenedor lb a los bridges lxdbr1 & lxdbr0 y Asignamos sus direcciones IPv4:
 		networkconfig.networkconfig(lb, n_bridges, ip_inc, n_lb)
 		# creación de los clientes
-		#crear.crear(c1, imagen, n_c1)
-		#networkconfig.networkconfig(c1, n_c1, ip1, n_lb)
+		crear.crear(c1, imagen, n_c1)
+		networkconfig.networkconfig(c1, n_c1, ip1, n_lb)
 		print("created!")
 	
 	elif orden == "start":
@@ -91,7 +91,7 @@ try:
 			numero = pickle.load(fich)
 		start.start(s, numero)
 		start.start(lb, n_lb)	
-		#start.start(c1, n_c1)	
+		start.start(c1, n_c1)	
 		print("started!")
 
 	elif orden == "list":
@@ -101,7 +101,7 @@ try:
 		lista.lista(s, numero)
 		lista.lista(lb, n_lb)
 		lista.lista(db, n_db)
-		#lista.lista(c1, n_c1)
+		lista.lista(c1, n_c1)
 		subprocess.run(["lxc", orden])
 
 	elif orden == "delete":
@@ -111,7 +111,7 @@ try:
 			numero = pickle.load(fich)
 		delete.delete(s, numero)
 		delete.delete(lb, n_lb)
-		#delete.delete(c1, n_c1)
+		delete.delete(c1, n_c1)
 		with open("remoto.txt", "rb") as fich:
 			valor = pickle.load(fich)
 		if valor == False:
@@ -128,7 +128,7 @@ try:
 			numero = pickle.load(fich)
 		pause.pause(s, numero)
 		pause.pause(lb, n_lb)
-		#pause.pause(c1, n_c1)
+		pause.pause(c1, n_c1)
 		with open("remoto.txt", "rb") as fich:
 			valor = pickle.load(fich)
 		if valor == False:
@@ -150,10 +150,11 @@ try:
 		print("paused "+nombre+"!")
 
 	elif orden == "configure": # configura el servicio web (app en servidores y base de datos en db) + el balanceador
+		configure_servidores.configure_servidores(s, ip0, lxdbr0)
 		try:
 			lB = sys.argv[2] # l212 por ejemplo
 			password = sys.argv[3] # contraseña del remoto en el LXC del remotodb
-			IP_B = ipremoto.guess_ip(lb)
+			IP_B = ipremoto.guess_ip(lB)
 			IP_A = ipremoto.guess_ip("A")
 			with open("remoto.txt", "wb") as fich:
 				pickle.dump(True, fich)
@@ -164,7 +165,6 @@ try:
 			with open("remoto.txt", "wb") as fich:
 				pickle.dump(False, fich)
 
-		configure_servidores.configure_servidores(s, ip0, lxdbr0)
 		configure_lb.configure_lb(lb, n_lb, s, port_serv)
 		print("configured!")
 	else:

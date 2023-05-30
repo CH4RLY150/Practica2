@@ -8,13 +8,11 @@ logger = logging.getLogger(__name__)
 
 def configureremoto(db, parametros, IP_B, port, ip_, lxdbr, IP_A, password, s):
 	try:
-		# conectamos los servidores con una DDBB remota
-			#db$ ip addr show
-			#db$ lxc config set core.https_address IP-B:8443
-			#db$ lxc config set core.trust_password mypass
-		#configuración del remoto
-		subprocess.run(["lxc", "config", "set", "core.https_address", IP_A+":"+port])
-		subprocess.run(["lxc", "remote", "add", "remoto"+db, IP_B+":"+port, "--password", password, "--accept-certificate"])
+		#Permitir el acceso remoto a las operaciones de LXD en lA + Acreditarse en el sistema remoto. Esto permite al equipo lA conectarse de manera remota al servicio LXD que se ejecuta en el equipo lB
+		#subprocess.run(["lxc", "config", "set", "core.https_address", ":"+port])
+		#subprocess.run(["lxc", "remote", "add", "remoto"+db, IP_B+":"+port])
+		#"--password", password, "--accept-certificate"
+		subprocess.run(["lxc", "remote", "add", "remoto"+db, IP_B])
 		#configuración de red y bridges
 		subprocess.run(["lxc", "network", "set", "remoto"+db+":"+lxdbr, "ipv4.addres", ip_])
 		subprocess.run(["lxc", "network", "set", "remoto"+db+":"+lxdbr, "ipv4.nat", "true" ])
@@ -48,8 +46,9 @@ def configureremoto(db, parametros, IP_B, port, ip_, lxdbr, IP_A, password, s):
 			numero = pickle.load(files)
 		for i in range(int(numero)):
 			nombre = s + str(i)
-			subprocess.run(["lxc", "push", "/home/c.mbarros/Práctica_2/app/md-seed-config.js", nombre+"/app/md-seed-config.js"])
-			subprocess.run(["lxc", "push", "/home/c.mbarros/Práctica_2/app/rest_server.js", nombre+"/app/rest_server.js"])
+			subprocess.run(["lxc", "start", nombre])
+			subprocess.run(["lxc", "file", "push", "/home/c.mbarros/Práctica_2/app/md-seed-config.js", nombre+"/app/md-seed-config.js"])
+			subprocess.run(["lxc", "file", "push", "/home/c.mbarros/Práctica_2/app/rest_server.js", nombre+"/app/rest_server.js"])
 			
 	
 	except IndexError:
