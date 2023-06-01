@@ -16,7 +16,7 @@ def crear(orden, imagen, parametros):
 		if parametros == "1":
 			subprocess.run(["lxc", "init", imagen, orden])
 		elif orden == "s":
-			crear_servidores.crear_servidores(orden, imagen, parametros)
+			crear_servidores.crear_servidores(orden, imagen, parametros, nom_imagen)
 		else:
 			for i in range(int(parametros)):
 				nombre = orden + str(i)

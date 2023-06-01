@@ -36,7 +36,7 @@ def networkconfig(orden, parametros, ip1, n_lb):
 					nombre = orden + str(i)
 				subprocess.run(["lxc", "network", "attach", lxdbr0, nombre, "eth0"])
 				subprocess.run(["lxc", "config", "device", "set", nombre, "eth0", "ipv4.address", ip1 + str(i)])
-				with open("ip_db.txt", "wb") as fich:
+				with open("ip_db"+str(i)+".txt", "wb") as fich:
 					pickle.dump(ip1 + str(i), fich)
 		elif orden == "cl":
 			for i in range(int(parametros)):

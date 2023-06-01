@@ -3,8 +3,8 @@ import subprocess
 import time
 import pickle
 
-def crear_servidores(orden, imagen, parametros):
-	with open("ip_db.txt", "rb") as ipdb:
+def crear_servidores(orden, imagen, parametros, nom_imagen):
+	with open("ip_db"+str(0)+".txt", "rb") as ipdb:
 		ip = pickle.load(ipdb)
 		
 	#determinar el ip de la DB en app
@@ -21,10 +21,7 @@ def crear_servidores(orden, imagen, parametros):
 		lines[12-1]="    await mongoose.connect('mongodb://"+ip+"/bio_bbdd',{ useNewUrlParser: true, useUnifiedTopology: true })\n"
 	with open("app/rest_server.js", "w") as files:
 		files.writelines(lines)
-	
-	with open("nom_imagen.txt", "rb") as ficheros:
-		nom_imagen = pickle.load(ficheros)
-	ficheros.close()
+	files.close()
 	
 	nombre = orden + str(0)
 	subprocess.run(["lxc", "init", imagen, nombre])

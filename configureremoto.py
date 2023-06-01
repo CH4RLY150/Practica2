@@ -2,6 +2,7 @@ import sys
 import subprocess
 import logging
 import pickle
+import time
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
@@ -13,8 +14,8 @@ def configureremoto(db, parametros, IP_B, port, ip_, lxdbr, IP_A, password, s, i
 		#subprocess.run(["lxc", "remote", "add", "remoto"+db, IP_B+":"+port])
 		#"--password", password, "--accept-certificate"
 		subprocess.run(["lxc", "remote", "add", "remoto"+db, IP_B, "--password", password, "--accept-certificate"])
-		#configuración de red y bridges
-		subprocess.run(["lxc", "network", "set", "remoto"+db+":"+lxdbr, "ipv4.addres", ip_])
+		#configuración de red y bridges en máquina remota lB
+		subprocess.run(["lxc", "network", "set", "remoto"+db+":"+lxdbr, "ipv4.address", ip_])
 		subprocess.run(["lxc", "network", "set", "remoto"+db+":"+lxdbr, "ipv4.nat", "true" ])
 		for i in range(int(parametros)):
 			if parametros == "1":
@@ -23,7 +24,10 @@ def configureremoto(db, parametros, IP_B, port, ip_, lxdbr, IP_A, password, s, i
 				nombre = db + str(i)
 			subprocess.run(["lxc", "stop", nombre])
 			subprocess.run(["lxc", "init", imagen, "remoto"+db+":"+db])
+			subprocess.run(["lxc", "network", "attach", "remoto"+db+":"+lxdbr, db, "eth0"])
 			subprocess.run(["lxc", "config", "device", "override", "remoto"+db+":"+db, "eth0", "ipv4.address="+ip_db+str(i)])
+			subprocess.run(["lxc", "start", "remoto"+db+":"+db])
+			time.sleep(5)
 			subprocess.run(["lxc", "exec", "remoto"+db+":"+db, "--", "apt", "update"])
 			subprocess.run(["lxc", "exec", "remoto"+db+":"+db, "--", "apt", "install", "-y", "mongodb"])
 			subprocess.run(["lxc", "start", "remoto"+db+":"+nombre])
@@ -31,7 +35,6 @@ def configureremoto(db, parametros, IP_B, port, ip_, lxdbr, IP_A, password, s, i
 		
 		# actualizamos la ip de la db a la IP de la nueva db remota (que es la IP-B)
 		# para ello debemos cambiar los documentos de la app instalada en cada servidor 
-		print("///////////////////////hola////////////////////////")
 		lines = list()
 		with open("app/md-seed-config.js", "r+") as fichero:
 			lines = fichero.readlines()
@@ -46,17 +49,21 @@ def configureremoto(db, parametros, IP_B, port, ip_, lxdbr, IP_A, password, s, i
 		with open("app/rest_server.js", "w") as files:
 			files.writelines(lines)
 		files.close()
-		print("////////////////////adios///////////////////////")
+
 		with open("numero.txt", "rb") as files:
 			numero = pickle.load(files)
 		for i in range(int(numero)):
 			nombre = s + str(i)
 			subprocess.run(["lxc", "start", nombre])
-			subprocess.run(["lxc", "file", "push", "app/md-seed-config.js", nombre+"root/app/md-seed-config.js"])
-			subprocess.run(["lxc", "file", "push", "app/rest_server.js", nombre+"root/app/rest_server.js"])
+			subprocess.run(["lxc", "file", "push", "app/md-seed-config.js", nombre+"/root/app/md-seed-config.js"])
+			subprocess.run(["lxc", "file", "push", "app/rest_server.js", nombre+"/root/app/rest_server.js"])
+			if i > 0:
+				subprocess.run(["lxc", "stop", nombre])
+		print("///////////////////////hola////////////////////////")
 		subprocess.run(["lxc", "exec", s+str(0), "cd", "root/app"])
 		subprocess.run(["lxc", "exec", s+str(0), "npm", "run", "seed"])
-			
+		subprocess.run(["lxc", "stop", s+str(0)])
+		print("////////////////////adios///////////////////////")
 	
 	except IndexError:
 		logger.error("IndexError, no se ha introducido ninguna orden")

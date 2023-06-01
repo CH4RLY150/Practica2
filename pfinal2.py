@@ -119,6 +119,7 @@ try:
 		if valor == False:
 			delete.delete(db, n_db)
 		else:
+			delete.delete(db, n_db)
 			delete_remoto.delete_remoto(db, n_db)
 		for i in range(int(n_bridges)-1):
 			n = i + 1 
@@ -136,6 +137,7 @@ try:
 		if valor == False:
 			pause.pause(db, n_db)
 		else:
+			pause.pause(db, n_db)
 			pause_remoto.pause_remoto(db, n_db)
 		print("paused!")
 
@@ -166,7 +168,6 @@ try:
 		except IndexError:
 			with open("remoto.txt", "wb") as fich:
 				pickle.dump(False, fich)
-
 
 		configure_lb.configure_lb(lb, n_lb, s, port_serv)
 		print("configured!")
