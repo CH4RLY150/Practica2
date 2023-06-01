@@ -63,6 +63,8 @@ try:
 			parametros = "2"
 		with open("numero.txt", "wb") as fich:
 			pickle.dump(parametros, fich)
+
+
 		# creación de los bridges virtuales y asignación de IP (subred)
 		red.red(n_bridges, ip_inc, ip_end, lxdbr_)
 		# creación de la base de datos db y le asignamos su tarjeta a un bridge
@@ -160,10 +162,11 @@ try:
 				pickle.dump(True, fich)
 			with open("ipdb.txt", "wb") as ipdb:
 				pickle.dump(IP_B, ipdb)
-			configureremoto.configureremoto(db, n_db, IP_B, port, ip_inc+"0"+ip_end, lxdbr_remoto, IP_A, password, s)
+			configureremoto.configureremoto(db, n_db, IP_B, port, ip_inc+"0"+ip_end, lxdbr_remoto, IP_A, password, s, ip__db, imagen)
 		except IndexError:
 			with open("remoto.txt", "wb") as fich:
 				pickle.dump(False, fich)
+
 
 		configure_lb.configure_lb(lb, n_lb, s, port_serv)
 		print("configured!")

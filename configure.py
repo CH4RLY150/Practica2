@@ -16,7 +16,7 @@ def configure(db, parametros):
 				nombre = db + str(i)
 			subprocess.run(["lxc", "exec", nombre, "--", "apt", "update"])
 			subprocess.run(["lxc", "exec", nombre, "--", "apt","install", "-y", "mongodb"])
-			subprocess.run(["lxc", "file", "push", "/home/c.mbarros/Práctica_2/mongodb/mongodb.conf", nombre+"/etc/mongodb.conf"])
+			subprocess.run(["lxc", "file", "push", "mongodb/mongodb.conf", nombre+"/etc/mongodb.conf"])
 			subprocess.run(["lxc", "restart", nombre])
 	
 	except IndexError:
