@@ -25,7 +25,7 @@ Servidores --> pasamos el fichero install.sh al contenedor + Chmod +x --> cambia
 
 Balanceador (lb) --> ejecutamos el “-apt update” que busca actualizaciones del SO y luego descargamos el código de la aplicación haproxy que se encargará de proporcionarnos un punto único de entrada de peticiones a la aplicación, además de redirigir todo el tráfico de peticiones HTTP de manera efectiva entre los servidores. Al modificar el documento de haproxy.cfg estamos especificando que en el puerto 8001 (preestablecido por el código de la "app") están conectados los puertos 8000 de cada servidor, diferenciables por su dirección IP. 
 ### Configure Remoto 
-Hay una función definida en un fichero "ipremoto.py", que nos dice cúal es la IP de un ordenador del laboratorio a partor de su número (por ejemplo "ipremoto.guess_ip("l212")")
+Hay una función definida en un fichero "ipremoto.py", que nos dice cúal es la IP de un ordenador del laboratorio a partir de su puesto de laboratorio (por ejemplo "ipremoto.guess_ip("l212")")
 
 configuración de acceso remoto a servicios desplegados mediante lxd en un ordenador ajeno.
 
@@ -37,7 +37,7 @@ configuración de acceso remoto a servicios desplegados mediante lxd en un orden
 Todo esto está resumido en un programa dentro del fichero "remoto.py", que podemos ejecutar mediante el comando "python3 remoto.py lb mypass", donde lb puede ser "l212" y mypass puede ser "contraseña", con eso ya tendríamos configurado el acceso remoto al programa LXD en el computador "lb" (NO OLVIDAR EJECUTAR LOS COMANDOS INICIALES DE USERRMOD, NEWGRP Y INIT).
 	
 
-Ordenador_Principal$ lxc config set core.https address IP-A:8443 --> configura la dirección y puerto de acceso remoto al servidor LXD
+Ordenador_Principal$ lxc config set core.https address :8443 --> configura la dirección y puerto de acceso remoto al servidor LXD
 
 Ordenador_Principal$ lxc config set core.trust password mypass --> define contraseña de acceso
 
@@ -46,6 +46,8 @@ Ordenador_Principal$ lxc remote add remotodb IP-B:8443 --password mypass --accep
 Ordenador_Principal$ lxc network set remoto:lxdbr0 ipv4.address 134.3.0.1/24
 
 Ordenador_Principal$ lxc network set remoto:lxdbr0 ipv4.nat true --> Configurar un bridge remoto
+
+Después a partir del remoto conseguimos crear, actualizar y configurar nuestro contenedor db, además de añadirle un proxy (asociación de "138.4.31.132:27017" = dirección máquina física, en este caso lB, a "138.3.0.20:27017" = dirección contenedor db) para que todas las consultas que lleguen al puerto 27017 de la máquina física remota sean redirigidos al contenedor db.
 ### Start
 Start --> arranca un contenedor linux
 
