@@ -35,21 +35,20 @@ configuración de acceso remoto a servicios desplegados mediante lxd en un orden
 	
 	#db$ lxc config set core.trust_password mypass
 Todo esto está resumido en un programa dentro del fichero "remoto.py", que podemos ejecutar mediante el comando "python3 remoto.py lb mypass", donde lb puede ser "l212" y mypass puede ser "contraseña", con eso ya tendríamos configurado el acceso remoto al programa LXD en el computador "lb" (NO OLVIDAR EJECUTAR LOS COMANDOS INICIALES DE USERRMOD, NEWGRP Y INIT).
-	
 
-Ordenador_Principal$ lxc config set core.https address :8443 --> configura la dirección y puerto de acceso remoto al servidor LXD
+	Ordenador_Principal$ lxc config set core.https address :8443 --> configura la dirección y puerto de acceso remoto al servidor LXD
 
-Ordenador_Principal$ lxc config set core.trust password mypass --> define contraseña de acceso
+	Ordenador_Principal$ lxc config set core.trust password mypass --> define contraseña de acceso
 
-Ordenador_Principal$ lxc remote add remotodb IP-B:8443 --password mypass --accept-certificate --> Acreditarse en el sistema remoto que ejecuta el servicio LXD del equipo lB
+	Ordenador_Principal$ lxc remote add remotodb IP-B:8443 --password mypass --accept-certificate --> Acreditarse en el sistema remoto que ejecuta el servicio LXD del equipo lB
 
-Ordenador_Principal$ lxc network set remoto:lxdbr0 ipv4.address 134.3.0.1/24
+	Ordenador_Principal$ lxc network set remoto:lxdbr0 ipv4.address 134.3.0.1/24
 
-Ordenador_Principal$ lxc network set remoto:lxdbr0 ipv4.nat true --> Configurar un bridge remoto
+	Ordenador_Principal$ lxc network set remoto:lxdbr0 ipv4.nat true --> Configurar un bridge remoto
 
 Después a partir del remoto conseguimos crear, actualizar y configurar nuestro contenedor db, además de añadirle un proxy (asociación de "138.4.31.132:27017" = dirección máquina física, en este caso lB, a "138.3.0.20:27017" = dirección contenedor db) para que todas las consultas que lleguen al puerto 27017 de la máquina física remota sean redirigidos al contenedor db.
 
-Ordenador_Remoto$ lxc config device add remotodb:db miproxy proxy listen=tcp:IP_B:27017 connect=tcp:ip_db:27017
+	Ordenador_Remoto$ lxc config device add remotodb:db miproxy proxy listen=tcp:IP_B:27017 connect=tcp:ip_db:27017
 ### Start
 Start --> arranca un contenedor linux
 
