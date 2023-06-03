@@ -48,6 +48,8 @@ Ordenador_Principal$ lxc network set remoto:lxdbr0 ipv4.address 134.3.0.1/24
 Ordenador_Principal$ lxc network set remoto:lxdbr0 ipv4.nat true --> Configurar un bridge remoto
 
 Después a partir del remoto conseguimos crear, actualizar y configurar nuestro contenedor db, además de añadirle un proxy (asociación de "138.4.31.132:27017" = dirección máquina física, en este caso lB, a "138.3.0.20:27017" = dirección contenedor db) para que todas las consultas que lleguen al puerto 27017 de la máquina física remota sean redirigidos al contenedor db.
+
+Ordenador_Remoto$ lxc config device add remotodb:db miproxy proxy listen=tcp:IP_B:27017 connect=tcp:ip_db:27017
 ### Start
 Start --> arranca un contenedor linux
 
