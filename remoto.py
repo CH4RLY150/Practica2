@@ -17,4 +17,4 @@ mypass = sys.argv[2]
 # conectamos los servidores con una DDBB remota
 IP_B = ipremoto.guess_ip(lb)
 subprocess.run(["lxc", "config", "set", "core.https_address", IP_B+":"+port]) 
-subprocess.run(["lxc", "config", "set", "core.trust_password", mypass]) 
+subprocess.run(["lxc", "config", "set", "core.trust_password", mypass])

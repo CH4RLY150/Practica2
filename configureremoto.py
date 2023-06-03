@@ -10,9 +10,8 @@ logger = logging.getLogger(__name__)
 def configureremoto(db, parametros, IP_B, port, ip_, lxdbr, IP_A, password, s, ip_db, imagen):
 	try:
 		#Permitir el acceso remoto a las operaciones de LXD en lA + Acreditarse en el sistema remoto. Esto permite al equipo lA conectarse de manera remota al servicio LXD que se ejecuta en el equipo lB
-		#subprocess.run(["lxc", "config", "set", "core.https_address", ":"+port])
+		subprocess.run(["lxc", "config", "set", "core.https_address", ":"+port])
 		#subprocess.run(["lxc", "remote", "add", "remoto"+db, IP_B+":"+port])
-		#"--password", password, "--accept-certificate"
 		subprocess.run(["lxc", "remote", "add", "remoto"+db, IP_B, "--password", password, "--accept-certificate"])
 		#configuración de red y bridges en máquina remota lB
 		subprocess.run(["lxc", "network", "set", "remoto"+db+":"+lxdbr, "ipv4.address", ip_])
@@ -24,13 +23,14 @@ def configureremoto(db, parametros, IP_B, port, ip_, lxdbr, IP_A, password, s, i
 				nombre = db + str(i)
 			subprocess.run(["lxc", "stop", nombre])
 			subprocess.run(["lxc", "init", imagen, "remoto"+db+":"+db])
-			subprocess.run(["lxc", "network", "attach", "remoto"+db+":"+lxdbr, db, "eth0"])
+			#subprocess.run(["lxc", "network", "attach", "remoto"+db+":"+lxdbr, db, "eth0"])
 			subprocess.run(["lxc", "config", "device", "override", "remoto"+db+":"+db, "eth0", "ipv4.address="+ip_db+str(i)])
 			subprocess.run(["lxc", "start", "remoto"+db+":"+db])
 			time.sleep(5)
 			subprocess.run(["lxc", "exec", "remoto"+db+":"+db, "--", "apt", "update"])
 			subprocess.run(["lxc", "exec", "remoto"+db+":"+db, "--", "apt", "install", "-y", "mongodb"])
-			subprocess.run(["lxc", "start", "remoto"+db+":"+nombre])
+			subprocess.run(["lxc", "file", "push", "mongodb/mongodb.conf", "remoto"+db+":"+nombre+"/etc/mongodb.conf"])
+			subprocess.run(["lxc", "restart", "remoto"+db+":"+nombre])
 			subprocess.run(["lxc", "config", "device", "add", "remoto"+db+":"+db, "miproxy", "proxy", "listen=tcp:"+IP_B+":27017", "connect=tcp:"+ip_db+str(i)+":27017"])
 		
 		# actualizamos la ip de la db a la IP de la nueva db remota (que es la IP-B)
@@ -59,11 +59,10 @@ def configureremoto(db, parametros, IP_B, port, ip_, lxdbr, IP_A, password, s, i
 			subprocess.run(["lxc", "file", "push", "app/rest_server.js", nombre+"/root/app/rest_server.js"])
 			if i > 0:
 				subprocess.run(["lxc", "stop", nombre])
-		print("///////////////////////hola////////////////////////")
-		subprocess.run(["lxc", "exec", s+str(0), "cd", "root/app"])
-		subprocess.run(["lxc", "exec", s+str(0), "npm", "run", "seed"])
+		
+		subprocess.run(["lxc", "exec", s+str(0), "--", "chmod", "+x", "install.sh"])
+		subprocess.run(["lxc", "exec", s+str(0), "--", "./install.sh"])
 		subprocess.run(["lxc", "stop", s+str(0)])
-		print("////////////////////adios///////////////////////")
 	
 	except IndexError:
 		logger.error("IndexError, no se ha introducido ninguna orden")
